@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 
+#include "SimpleCrypt.h"
+
 namespace Ui {
 class MainWindow;
 }
@@ -17,6 +19,8 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    void addClient(std::string hostname);
+    SimpleCrypt crypto;
 };
 
 #endif // MAINWINDOW_H

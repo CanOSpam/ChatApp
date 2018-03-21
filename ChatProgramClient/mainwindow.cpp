@@ -29,8 +29,6 @@ MainWindow::MainWindow(QWidget *parent) :
     }
 
     //Receiver Thread
-    //Print to text window function
-    //Send Function
 }
 
 MainWindow::~MainWindow()
@@ -39,6 +37,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+// Connect buttons and actions
 void MainWindow::connectAll()
 {
     connect(ui->actionConnect, &QAction::triggered, this, &MainWindow::connectToServer);
@@ -48,6 +47,7 @@ void MainWindow::connectAll()
     connect(ui->sendEdit, &QLineEdit::returnPressed, this, &MainWindow::sendToServer);
 }
 
+// Connect to server
 void MainWindow::connectToServer()
 {
     bool ok = false;
@@ -64,11 +64,13 @@ void MainWindow::connectToServer()
     }
 }
 
+// Disconnect from server and cleanup
 void MainWindow::disconnectFromServer()
 {
 
 }
 
+// Save chatlog to file
 void MainWindow::saveToFile()
 {
     std::ofstream saveFile;
@@ -83,6 +85,7 @@ void MainWindow::saveToFile()
     saveFile.close();
 }
 
+// Send chat message to server
 void MainWindow::sendToServer()
 {
     //Write to textedit
@@ -95,8 +98,9 @@ void MainWindow::sendToServer()
     ui->sendEdit->setText("");
 }
 
+// Write a QString to chat messages window
 void MainWindow::writeToTextEdit(QString str)
 {
-    str = crypto.decryptToString(str);
+    //str = crypto.decryptToString(str);
     ui->messagesEdit->append(QDateTime::currentDateTime().time().toString() + "\tMe: " + str);
 }

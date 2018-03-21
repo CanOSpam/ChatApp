@@ -1,12 +1,14 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
     connectAll();
+    crypto.setKey(Q_UINT64_C(0x0e99d0161aa9070c));
 
     if ((listen_sd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
     {
@@ -87,7 +89,7 @@ void MainWindow::sendToServer()
     writeToTextEdit(ui->sendEdit->text());
 
     //Send contents of lineedit
-
+    //send: crypto.encryptToString(ui->sendEdit->text());
 
     //clear lineedit
     ui->sendEdit->setText("");
@@ -95,5 +97,6 @@ void MainWindow::sendToServer()
 
 void MainWindow::writeToTextEdit(QString str)
 {
-     ui->messagesEdit->append(QDateTime::currentDateTime().time().toString() + "\tMe: " + str);
+    str = crypto.decryptToString(str);
+    ui->messagesEdit->append(QDateTime::currentDateTime().time().toString() + "\tMe: " + str);
 }

@@ -12,6 +12,8 @@
 #include <QInputDialog>
 #include <QMessageBox>
 
+#include "SimpleCrypt.h"
+
 namespace Ui {
 class MainWindow;
 }
@@ -27,6 +29,7 @@ public:
 private:
     int listen_sd;
     int arg;
+    SimpleCrypt crypto;
 
     Ui::MainWindow *ui;
     void connectAll();

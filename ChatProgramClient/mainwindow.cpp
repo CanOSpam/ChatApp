@@ -7,6 +7,25 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     connectAll();
+
+    if ((listen_sd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+    {
+        QMessageBox msgBox;
+        msgBox.setIcon(QMessageBox::Warning);
+        msgBox.setText("Socket failed to open");
+        msgBox.setWindowTitle("Warning");
+        msgBox.exec();
+    }
+
+    if (setsockopt (listen_sd, SOL_SOCKET, SO_REUSEADDR, &arg, sizeof(arg)) == -1)
+    {
+        QMessageBox msgBox;
+        msgBox.setIcon(QMessageBox::Warning);
+        msgBox.setText("Setsockopt failed");
+        msgBox.setWindowTitle("Warning");
+        msgBox.exec();
+    }
+
     //Receiver Thread
     //Print to text window function
     //Send Function
@@ -29,8 +48,18 @@ void MainWindow::connectAll()
 
 void MainWindow::connectToServer()
 {
-    ui->sendEdit->setEnabled(true);
-    ui->sendButton->setEnabled(true);
+    bool ok = false;
+    QString text = QInputDialog::getText(this, tr("QInputDialog::getText()"),
+                                             tr("IP to connect to:"), QLineEdit::Normal,
+                                             "0.0.0.0", &ok);
+
+    if(ok)
+    {
+        ui->sendEdit->setEnabled(true);
+        ui->sendButton->setEnabled(true);
+        ui->actionConnect->setEnabled(false);
+        ui->actionDisconnect->setEnabled(true);
+    }
 }
 
 void MainWindow::disconnectFromServer()
@@ -55,12 +84,16 @@ void MainWindow::saveToFile()
 void MainWindow::sendToServer()
 {
     //Write to textedit
-    QString temp = ui->sendEdit->text();
-    ui->messagesEdit->append(QDateTime::currentDateTime().time().toString() + "\tMe: " + temp);
+    writeToTextEdit(ui->sendEdit->text());
 
     //Send contents of lineedit
 
 
     //clear lineedit
     ui->sendEdit->setText("");
+}
+
+void MainWindow::writeToTextEdit(QString str)
+{
+     ui->messagesEdit->append(QDateTime::currentDateTime().time().toString() + "\tMe: " + str);
 }

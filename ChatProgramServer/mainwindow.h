@@ -20,6 +20,7 @@ public:
 private:
     Ui::MainWindow *ui;
     void addClient(std::string hostname);
+    void removeClient(std::string hostname);
     SimpleCrypt crypto;
 };
 

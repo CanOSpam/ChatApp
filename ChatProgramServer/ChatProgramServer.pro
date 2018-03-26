@@ -30,7 +30,8 @@ SOURCES += \
 
 HEADERS += \
         mainwindow.h \
-    SimpleCrypt.h
+    SimpleCrypt.h \
+    extras.h
 
 FORMS += \
         mainwindow.ui

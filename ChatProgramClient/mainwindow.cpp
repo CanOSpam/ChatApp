@@ -27,13 +27,12 @@ MainWindow::MainWindow(QWidget *parent) :
         msgBox.setWindowTitle("Warning");
         msgBox.exec();
     }
-
-    //Receiver Thread
 }
 
 MainWindow::~MainWindow()
 {
     //Send Quit Message
+    running = false;
     delete ui;
 }
 
@@ -51,6 +50,10 @@ void MainWindow::connectAll()
 void MainWindow::connectToServer()
 {
     bool ok = false;
+    bool connectionGood = false;
+
+    ui->messagesEdit->setText("");
+
     QString text = QInputDialog::getText(this, tr("QInputDialog::getText()"),
                                              tr("IP to connect to:"), QLineEdit::Normal,
                                              "0.0.0.0", &ok);
@@ -62,12 +65,46 @@ void MainWindow::connectToServer()
         ui->actionConnect->setEnabled(false);
         ui->actionDisconnect->setEnabled(true);
     }
+    else
+    {
+        return;
+    }
+
+    // TODO:
+    // Connect to the server
+
+    // Start listener thread
+    if(connectionGood)
+    {
+        running = true;
+        thread = std::thread([&](){
+                while(running)
+                {
+                    // TODO:
+                    // Receive String
+                    // Decrypt
+                    // Write to textedit using function
+                }
+
+            });
+
+    }
 }
 
 // Disconnect from server and cleanup
 void MainWindow::disconnectFromServer()
 {
+    // Stop listener thread
+    running = false;
 
+    // TODO:
+    // Close connection to server
+
+    // Change enabled functions
+    ui->sendEdit->setEnabled(false);
+    ui->sendButton->setEnabled(false);
+    ui->actionConnect->setEnabled(true);
+    ui->actionDisconnect->setEnabled(false);
 }
 
 // Save chatlog to file
@@ -91,6 +128,7 @@ void MainWindow::sendToServer()
     //Write to textedit
     writeToTextEdit(ui->sendEdit->text());
 
+    // TODO:
     //Send contents of lineedit
     //send: crypto.encryptToString(ui->sendEdit->text());
 

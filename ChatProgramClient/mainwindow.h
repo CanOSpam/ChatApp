@@ -5,6 +5,9 @@
 #include <fstream>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <thread>
+
+#include <QDebug>
 
 #include <QMainWindow>
 #include <QTime>
@@ -30,10 +33,13 @@ private:
     int listen_sd;
     int arg;
     SimpleCrypt crypto;
+    std::thread thread;
+    bool running;
 
     Ui::MainWindow *ui;
     void connectAll();
     void writeToTextEdit(QString str);
+
 
 public slots:
     void connectToServer();

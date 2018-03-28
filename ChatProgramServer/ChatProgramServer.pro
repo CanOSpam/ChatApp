@@ -26,12 +26,15 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    SimpleCrypt.cpp
+    SimpleCrypt.cpp \
+    extras.cpp \
+    serverthread.cpp
 
 HEADERS += \
         mainwindow.h \
     SimpleCrypt.h \
-    extras.h
+    extras.h \
+    serverthread.h
 
 FORMS += \
         mainwindow.ui

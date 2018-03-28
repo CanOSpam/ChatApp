@@ -9,31 +9,31 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     connectAll();
     crypto.setKey(Q_UINT64_C(0x0e99d0161aa9070c));
+    memset((char *)&server, '\0', sizeof(struct sockaddr_in));
 
+    // Create Socket
     if ((listen_sd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
     {
-        QMessageBox msgBox;
-        msgBox.setIcon(QMessageBox::Warning);
-        msgBox.setText("Socket failed to open");
-        msgBox.setWindowTitle("Warning");
-        msgBox.exec();
+        raiseWarning("Warning", "Socket failed to open.");
     }
 
+    // Set Reusable
     if (setsockopt (listen_sd, SOL_SOCKET, SO_REUSEADDR, &arg, sizeof(arg)) == -1)
     {
-        QMessageBox msgBox;
-        msgBox.setIcon(QMessageBox::Warning);
-        msgBox.setText("Setsockopt failed");
-        msgBox.setWindowTitle("Warning");
-        msgBox.exec();
+        raiseWarning("Warning", "Setsockopt failed.");
     }
-
-    //Receiver Thread
 }
 
 MainWindow::~MainWindow()
 {
     //Send Quit Message
+    running = false;
+
+    if(thread.joinable())
+    {
+        thread.join();
+    }
+
     delete ui;
 }
 
@@ -51,6 +51,9 @@ void MainWindow::connectAll()
 void MainWindow::connectToServer()
 {
     bool ok = false;
+
+    ui->messagesEdit->setText("");
+
     QString text = QInputDialog::getText(this, tr("QInputDialog::getText()"),
                                              tr("IP to connect to:"), QLineEdit::Normal,
                                              "0.0.0.0", &ok);
@@ -62,12 +65,67 @@ void MainWindow::connectToServer()
         ui->actionConnect->setEnabled(false);
         ui->actionDisconnect->setEnabled(true);
     }
+    else
+    {
+        raiseWarning("Warning", "Input error.");
+        return;
+    }
+
+    // Connect to the server
+    server.sin_family = AF_INET;
+    server.sin_port = htons(PORT);
+
+    hp = gethostbyname(text.toStdString().c_str());
+    if (hp == NULL)
+    {
+        disconnectFromServer();
+        raiseWarning("Warning", "Unknown server address.");
+    }
+    else
+    {
+        // Connecting to the server
+        if (::connect (listen_sd, (struct sockaddr *)&server, sizeof(server)) == -1)
+        {
+            disconnectFromServer();
+            raiseWarning("Warning", "Cannot connect to server.");
+        }
+        else
+        {
+            // Start listener thread
+            running = true;
+            thread = std::thread([&](){
+                    while(running)
+                    {
+                        char tempRecvBuf[BUFLEN];
+                        memset(tempRecvBuf, '\0', BUFLEN);
+
+                        // Receive String
+                        recv(listen_sd, tempRecvBuf, BUFLEN, 0);
+
+                        // Write to textedit using function
+                        writeToTextEdit(QString(tempRecvBuf));
+                    }
+
+            });
+        }
+    }
+
 }
 
 // Disconnect from server and cleanup
 void MainWindow::disconnectFromServer()
 {
+    // Stop listener thread
+    running = false;
 
+    // TODO:
+    // Close connection to server
+
+    // Change enabled functions
+    ui->sendEdit->setEnabled(false);
+    ui->sendButton->setEnabled(false);
+    ui->actionConnect->setEnabled(true);
+    ui->actionDisconnect->setEnabled(false);
 }
 
 // Save chatlog to file
@@ -88,11 +146,20 @@ void MainWindow::saveToFile()
 // Send chat message to server
 void MainWindow::sendToServer()
 {
-    //Write to textedit
-    writeToTextEdit(ui->sendEdit->text());
+    // Write to textedit
+    QString temp = ui->sendEdit->text();
+    temp = crypto.encryptToString(temp);
 
-    //Send contents of lineedit
-    //send: crypto.encryptToString(ui->sendEdit->text());
+    // Write to textedit
+    writeToTextEdit(temp);
+
+    // Create c str buffer
+    char tempSend[BUFLEN];
+    memset(tempSend, '\0', BUFLEN);
+    strcpy(tempSend, temp.toStdString().c_str());
+
+    // Send
+    send (listen_sd, tempSend, temp.length(), 0);
 
     //clear lineedit
     ui->sendEdit->setText("");
@@ -101,6 +168,15 @@ void MainWindow::sendToServer()
 // Write a QString to chat messages window
 void MainWindow::writeToTextEdit(QString str)
 {
-    //str = crypto.decryptToString(str);
+    str = crypto.decryptToString(str);
     ui->messagesEdit->append(QDateTime::currentDateTime().time().toString() + "\tMe: " + str);
+}
+
+void MainWindow::raiseWarning(QString title, QString message)
+{
+    QMessageBox msgBox;
+    msgBox.setIcon(QMessageBox::Warning);
+    msgBox.setText(message);
+    msgBox.setWindowTitle(title);
+    msgBox.exec();
 }

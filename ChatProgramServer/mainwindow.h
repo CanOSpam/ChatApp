@@ -3,7 +3,6 @@
 
 #include <QMainWindow>
 
-#include "SimpleCrypt.h"
 
 namespace Ui {
 class MainWindow;
@@ -25,7 +24,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
     void addClient(std::string hostname);
-    SimpleCrypt crypto;
+    void removeClient(std::string hostname);
 };
 
 #endif // MAINWINDOW_H

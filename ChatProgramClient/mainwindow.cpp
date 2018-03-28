@@ -84,6 +84,7 @@ void MainWindow::connectToServer()
     else
     {
         // Connecting to the server
+        bcopy(hp->h_addr, (char *)&server.sin_addr, hp->h_length);
         if (::connect (listen_sd, (struct sockaddr *)&server, sizeof(server)) == -1)
         {
             disconnectFromServer();
@@ -93,18 +94,18 @@ void MainWindow::connectToServer()
         {
             // Start listener thread
             running = true;
-            thread = std::thread([&](){
-                    while(running)
-                    {
-                        char tempRecvBuf[BUFLEN];
-                        memset(tempRecvBuf, '\0', BUFLEN);
+            thread = std::thread([&]{
+                while(running)
+                {
+                    char tempRecvBuf[BUFLEN];
+                    memset(tempRecvBuf, '\0', BUFLEN);
 
-                        // Receive String
-                        recv(listen_sd, tempRecvBuf, BUFLEN, 0);
+                    // Receive String
+                    recv(listen_sd, tempRecvBuf, BUFLEN, 0);
 
-                        // Write to textedit using function
-                        writeToTextEdit(QString(tempRecvBuf));
-                    }
+                    // Write to textedit using function
+                    writeToTextEdit(QString(tempRecvBuf));
+                }
 
             });
         }

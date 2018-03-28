@@ -9,7 +9,7 @@
 #include "extras.h"
 #include "serverthread.h"
 #define PORT 42069
-#define MAXLINE 80
+#define MAXLINE 255
 
 serverThread::serverThread()
 {

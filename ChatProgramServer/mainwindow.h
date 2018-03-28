@@ -19,6 +19,8 @@ public:
 private slots:
     void on_actionStart_triggered();
 
+    void on_actionStop_triggered();
+
 private:
     Ui::MainWindow *ui;
     void addClient(std::string hostname);

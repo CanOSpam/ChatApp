@@ -13,6 +13,7 @@
 
 serverThread::serverThread()
 {
+    running = true;
 }
 
 void serverThread::run()
@@ -77,7 +78,7 @@ void serverThread::run()
     // add listen socket to allset
     FD_SET(listenfd, &allset);
 
-    while (1)
+    while (running)
     {
         qDebug() << "Listening";
         rset = allset;

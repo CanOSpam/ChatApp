@@ -13,6 +13,7 @@ MainWindow::MainWindow(QWidget *parent) :
     addClient("Test2");
     addClient("Test3");
 
+    removeClient("Test1");
 }
 
 serverThread server;
@@ -27,6 +28,14 @@ void MainWindow::addClient(std::string hostname)
     ui->listWidget->addItem(QString::fromStdString(hostname));
 }
 
+void MainWindow::removeClient(std::string hostname)
+{
+    QList<QListWidgetItem *> items = ui->listWidget->findItems(QString::fromStdString(hostname), 0);
+    foreach(QListWidgetItem * item, items)
+    {
+        delete ui->listWidget->takeItem(ui->listWidget->row(item));
+    }
+}
 
 void MainWindow::on_actionStart_triggered()
 {

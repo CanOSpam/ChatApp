@@ -9,10 +9,11 @@
 #include "extras.h"
 #include "serverthread.h"
 #define PORT 42069
-#define MAXLINE 80
+#define MAXLINE 255
 
 serverThread::serverThread()
 {
+    running = true;
 }
 
 void serverThread::run()
@@ -85,7 +86,7 @@ void serverThread::run()
     // add listen socket to allset
     FD_SET(listenfd, &allset);
 
-    while (1)
+    while (running)
     {
         qDebug() << "Listening For Connections";
         rset = allset;

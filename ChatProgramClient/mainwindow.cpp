@@ -9,30 +9,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     connectAll();
     crypto.setKey(Q_UINT64_C(0x0e99d0161aa9070c));
-    memset((char *)&server, '\0', sizeof(struct sockaddr_in));
-
-    // Create Socket
-    if ((listen_sd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
-    {
-        raiseWarning("Warning", "Socket failed to open.");
-    }
-
-    // Set Reusable
-    if (setsockopt (listen_sd, SOL_SOCKET, SO_REUSEADDR, &arg, sizeof(arg)) == -1)
-    {
-        raiseWarning("Warning", "Setsockopt failed.");
-    }
 }
 
 MainWindow::~MainWindow()
 {
     //Send Quit Message
-    running = false;
-
-    if(thread.joinable())
-    {
-        thread.join();
-    }
+    disconnectFromServer();
 
     delete ui;
 }
@@ -51,6 +33,20 @@ void MainWindow::connectAll()
 // Connect to server
 void MainWindow::connectToServer()
 {
+    memset((char *)&server, '\0', sizeof(struct sockaddr_in));
+
+    // Create Socket
+    if ((listen_sd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+    {
+        raiseWarning("Warning", "Socket failed to open.");
+    }
+
+    // Set Reusable
+    if (setsockopt (listen_sd, SOL_SOCKET, SO_REUSEADDR, &arg, sizeof(arg)) == -1)
+    {
+        raiseWarning("Warning", "Setsockopt failed.");
+    }
+
     bool ok = false;
 
     ui->messagesEdit->setText("");
@@ -117,11 +113,18 @@ void MainWindow::connectToServer()
 // Disconnect from server and cleanup
 void MainWindow::disconnectFromServer()
 {
+    // TODO:
+    // Close connection to server
+    shutdown(listen_sd, SHUT_RD);
+    ::close(listen_sd);
+
     // Stop listener thread
     running = false;
 
-    // TODO:
-    // Close connection to server
+    if(thread.joinable())
+    {
+        thread.join();
+    }
 
     // Change enabled functions
     ui->sendEdit->setEnabled(false);

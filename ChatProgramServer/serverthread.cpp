@@ -27,6 +27,7 @@ void serverThread::run()
     int port = PORT;
     int nready;
     int client[FD_SETSIZE];
+    struct sockaddr_in cliaddrs[FD_SETSIZE];
     char buf[MAXLINE];
     ssize_t n;
     struct sockaddr_in cliaddr, servaddr;
@@ -112,6 +113,12 @@ void serverThread::run()
                 if (client[i] < 0)
                 {
                     client[i] = confd;
+                    cliaddrs[i] = cliaddr;
+
+                    char str[INET_ADDRSTRLEN];
+                    inet_ntop( AF_INET, &cliaddrs[i].sin_addr, str, INET_ADDRSTRLEN );
+
+                    emit addClient(str);
                     break;
                 }
             }
@@ -125,7 +132,7 @@ void serverThread::run()
             // set the allset value to 1
             FD_SET(confd, &allset);
 
-            //
+
             if (confd > maxfd)
             {
                 maxfd = confd;
@@ -158,6 +165,13 @@ void serverThread::run()
                     Close(sockfd);
                     FD_CLR(sockfd,&allset);
                     client[i] = -1;
+
+                    char str[INET_ADDRSTRLEN];
+                    inet_ntop( AF_INET, &cliaddrs[i].sin_addr, str, INET_ADDRSTRLEN );
+
+                    emit addClient(str);
+
+                    memset(&cliaddrs[i], 0, clilen);
                 }
                 else
                 {

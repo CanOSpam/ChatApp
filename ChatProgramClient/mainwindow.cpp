@@ -158,7 +158,7 @@ void MainWindow::sendToServer()
 {
     // Write to textedit
     QString temp = username;
-    temp.append(":\t");
+    temp.append(": ");
     temp.append(ui->sendEdit->text());
     temp = crypto.encryptToString(temp);
 

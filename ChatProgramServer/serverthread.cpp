@@ -118,7 +118,7 @@ void serverThread::run()
                     char str[INET_ADDRSTRLEN];
                     inet_ntop( AF_INET, &cliaddrs[i].sin_addr, str, INET_ADDRSTRLEN );
 
-                    emit addClient(str);
+                    emit addClient(QString(str));
                     break;
                 }
             }
@@ -169,7 +169,7 @@ void serverThread::run()
                     char str[INET_ADDRSTRLEN];
                     inet_ntop( AF_INET, &cliaddrs[i].sin_addr, str, INET_ADDRSTRLEN );
 
-                    emit addClient(str);
+                    emit removeClient(QString(str));
 
                     memset(&cliaddrs[i], 0, clilen);
                 }

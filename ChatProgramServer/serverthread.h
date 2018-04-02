@@ -14,8 +14,8 @@ public:
     bool running;
 
 signals:
-    void addClient(std::string hostname);
-    void removeClient(std::string hostname);
+    void addClient(QString hostname);
+    void removeClient(QString hostname);
 };
 
 #endif // SERVERTHREAD_H

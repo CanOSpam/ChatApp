@@ -23,14 +23,14 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::addClient(std::string hostname)
+void MainWindow::addClient(QString hostname)
 {
-    ui->listWidget->addItem(QString::fromStdString(hostname));
+    ui->listWidget->addItem(hostname);
 }
 
-void MainWindow::removeClient(std::string hostname)
+void MainWindow::removeClient(QString hostname)
 {
-    QList<QListWidgetItem *> items = ui->listWidget->findItems(QString::fromStdString(hostname), 0);
+    QList<QListWidgetItem *> items = ui->listWidget->findItems(hostname, 0);
 
     foreach(QListWidgetItem * item, items)
     {

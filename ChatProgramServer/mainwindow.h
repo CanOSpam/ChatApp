@@ -21,8 +21,8 @@ public:
 private slots:
     void on_actionStart_triggered();
     void on_actionStop_triggered();
-    void addClient(std::string hostname);
-    void removeClient(std::string hostname);
+    void addClient(QString hostname);
+    void removeClient(QString hostname);
 
 private:
     Ui::MainWindow *ui;

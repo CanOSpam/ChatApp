@@ -181,13 +181,14 @@ void MainWindow::sendToServer()
 void MainWindow::writeToTextEdit(QString str)
 {
     str = crypto.decryptToString(str);
-    ui->messagesEdit->append(QDateTime::currentDateTime().time().toString() + "\tMe:\t" + str);
+    ui->messagesEdit->append(QDateTime::currentDateTime().time().toString() + " ~ \t" + str);
 }
 
+// Slot to write a received message to messages window
 void MainWindow::writeReceivedToTextEdit(QString str)
 {
     str = crypto.decryptToString(str);
-    ui->messagesEdit->append(QDateTime::currentDateTime().time().toString() + "\t" + str);
+    ui->messagesEdit->append(QDateTime::currentDateTime().time().toString() + " ~ \t" + str);
 }
 
 void MainWindow::raiseWarning(QString title, QString message)

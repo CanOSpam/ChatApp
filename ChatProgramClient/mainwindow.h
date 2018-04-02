@@ -40,6 +40,7 @@ private:
     int arg;
     bool running;
     SimpleCrypt crypto;
+    QString username;
     std::thread thread;
     struct sockaddr_in server;
     struct hostent	*hp;

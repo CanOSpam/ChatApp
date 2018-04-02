@@ -51,9 +51,13 @@ void MainWindow::connectToServer()
 
     ui->messagesEdit->setText("");
 
-    QString text = QInputDialog::getText(this, tr("QInputDialog::getText()"),
+    QString ipAddr = QInputDialog::getText(this, tr("QInputDialog::getText()"),
                                              tr("IP to connect to:"), QLineEdit::Normal,
                                              "0.0.0.0", &ok);
+
+    username = QInputDialog::getText(this, tr("QInputDialog::getText()"),
+                                             tr("Username:"), QLineEdit::Normal,
+                                             "", &ok);
 
     if(ok)
     {
@@ -72,7 +76,7 @@ void MainWindow::connectToServer()
     server.sin_family = AF_INET;
     server.sin_port = htons(PORT);
 
-    hp = gethostbyname(text.toStdString().c_str());
+    hp = gethostbyname(ipAddr.toStdString().c_str());
     if (hp == NULL)
     {
         disconnectFromServer();
@@ -161,7 +165,8 @@ void MainWindow::sendToServer()
     // Create c str buffer
     char tempSend[BUFLEN];
     memset(tempSend, '\0', BUFLEN);
-    strcpy(tempSend, temp.toStdString().c_str());
+    strcat(tempSend, username.toStdString().c_str());
+    strcat(tempSend, temp.toStdString().c_str());
 
     // Send
     send (listen_sd, tempSend, temp.length(), 0);

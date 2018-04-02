@@ -65,6 +65,7 @@ void MainWindow::connectToServer()
         ui->sendButton->setEnabled(true);
         ui->actionConnect->setEnabled(false);
         ui->actionDisconnect->setEnabled(true);
+        ui->sendEdit->setMaxLength(255 - username.length() - 1);
     }
     else
     {
@@ -156,7 +157,9 @@ void MainWindow::saveToFile()
 void MainWindow::sendToServer()
 {
     // Write to textedit
-    QString temp = ui->sendEdit->text();
+    QString temp = username;
+    temp.append("\t");
+    temp.append(ui->sendEdit->text());
     temp = crypto.encryptToString(temp);
 
     // Write to textedit
@@ -165,8 +168,7 @@ void MainWindow::sendToServer()
     // Create c str buffer
     char tempSend[BUFLEN];
     memset(tempSend, '\0', BUFLEN);
-    strcat(tempSend, username.toStdString().c_str());
-    strcat(tempSend, temp.toStdString().c_str());
+    strcpy(tempSend, temp.toStdString().c_str());
 
     // Send
     send (listen_sd, tempSend, temp.length(), 0);
@@ -179,7 +181,7 @@ void MainWindow::sendToServer()
 void MainWindow::writeToTextEdit(QString str)
 {
     str = crypto.decryptToString(str);
-    ui->messagesEdit->append(QDateTime::currentDateTime().time().toString() + "\tMe: " + str);
+    ui->messagesEdit->append(QDateTime::currentDateTime().time().toString() + "\tMe:\t" + str);
 }
 
 void MainWindow::writeReceivedToTextEdit(QString str)

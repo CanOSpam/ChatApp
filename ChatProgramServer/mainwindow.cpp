@@ -1,22 +1,19 @@
-#include <QDebug>
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "serverthread.h"
 
+#include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    addClient("Test1");
-    addClient("Test2");
-    addClient("Test3");
 
-    removeClient("Test1");
+    connect(&server, &serverThread::addClient, this, &MainWindow::addClient);
+    connect(&server, &serverThread::removeClient, this, &MainWindow::removeClient);
 }
 
-serverThread server;
+
 
 MainWindow::~MainWindow()
 {

@@ -7,7 +7,6 @@
 #include <QDebug>
 #include "serverthread.h"
 #include "extras.h"
-#include "serverthread.h"
 #define PORT 42069
 #define MAXLINE 255
 
@@ -162,11 +161,11 @@ void serverThread::run()
                 }
                 else
                 {
-                    for(int j = 0; j < maxi; j++)
+                    for(int j = 0; j <= maxi; j++)
                     {
                         if(client[j] != sockfd)
                         {
-                            write(client[j],buf,n);
+                            write(client[j], buf, n);
                         }
                     }
                 }

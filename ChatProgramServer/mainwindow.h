@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 
+#include "serverthread.h"
+
 
 namespace Ui {
 class MainWindow;
@@ -19,11 +21,12 @@ public:
 private slots:
     void on_actionStart_triggered();
     void on_actionStop_triggered();
+    void addClient(std::string hostname);
+    void removeClient(std::string hostname);
 
 private:
     Ui::MainWindow *ui;
-    void addClient(std::string hostname);
-    void removeClient(std::string hostname);
+    serverThread server;
 };
 
 #endif // MAINWINDOW_H

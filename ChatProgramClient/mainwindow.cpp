@@ -45,6 +45,7 @@ void MainWindow::connectAll()
     connect(ui->actionSave, &QAction::triggered, this, &MainWindow::saveToFile);
     connect(ui->sendButton, &QPushButton::clicked, this, &MainWindow::sendToServer);
     connect(ui->sendEdit, &QLineEdit::returnPressed, this, &MainWindow::sendToServer);
+    connect(this, &MainWindow::gotNewText, this, &MainWindow::writeReceivedToTextEdit);
 }
 
 // Connect to server
@@ -97,7 +98,6 @@ void MainWindow::connectToServer()
             thread = std::thread([&]{
                 while(running)
                 {
-                    connect(this, &MainWindow::gotNewText, this, &MainWindow::writeReceivedToTextEdit);
                     char tempRecvBuf[BUFLEN];
                     memset(tempRecvBuf, '\0', BUFLEN);
 

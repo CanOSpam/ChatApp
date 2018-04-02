@@ -162,7 +162,13 @@ void serverThread::run()
                 }
                 else
                 {
-                    write(sockfd,buf,n);
+                    for(int j = 0; j < maxi; j++)
+                    {
+                        if(client[j] != sockfd)
+                        {
+                            write(client[j],buf,n);
+                        }
+                    }
                 }
 
                 if (--nready <= 0)

@@ -97,11 +97,11 @@ void MainWindow::connectToServer()
                     char tempRecvBuf[BUFLEN];
                     memset(tempRecvBuf, '\0', BUFLEN);
 
-                    // Receive String
-                    recv(listen_sd, tempRecvBuf, BUFLEN, 0);
-
-                    // Write to textedit using function
-                    emit gotNewText(QString(tempRecvBuf));
+                    // Receive and Write to textedit using function
+                    if(recv(listen_sd, tempRecvBuf, BUFLEN, 0))
+                    {
+                        emit gotNewText(QString(tempRecvBuf));
+                    }
                 }
 
             });

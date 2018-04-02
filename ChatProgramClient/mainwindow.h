@@ -45,8 +45,8 @@ private:
 
     Ui::MainWindow *ui;
     void connectAll();
-    void writeToTextEdit(QString str);
     void raiseWarning(QString title, QString message);
+    void writeToTextEdit(QString str);
 
 
 public slots:
@@ -54,6 +54,10 @@ public slots:
     void disconnectFromServer();
     void saveToFile();
     void sendToServer();
+    void writeReceivedToTextEdit(QString str);
+
+signals:
+    void gotNewText(QString str);
 };
 
 #endif // MAINWINDOW_H

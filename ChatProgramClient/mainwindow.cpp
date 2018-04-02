@@ -97,6 +97,7 @@ void MainWindow::connectToServer()
             thread = std::thread([&]{
                 while(running)
                 {
+                    connect(this, &MainWindow::gotNewText, this, &MainWindow::writeReceivedToTextEdit);
                     char tempRecvBuf[BUFLEN];
                     memset(tempRecvBuf, '\0', BUFLEN);
 
@@ -104,7 +105,7 @@ void MainWindow::connectToServer()
                     recv(listen_sd, tempRecvBuf, BUFLEN, 0);
 
                     // Write to textedit using function
-                    writeToTextEdit(QString(tempRecvBuf));
+                    emit gotNewText(QString(tempRecvBuf));
                 }
 
             });
@@ -171,6 +172,12 @@ void MainWindow::writeToTextEdit(QString str)
 {
     str = crypto.decryptToString(str);
     ui->messagesEdit->append(QDateTime::currentDateTime().time().toString() + "\tMe: " + str);
+}
+
+void MainWindow::writeReceivedToTextEdit(QString str)
+{
+    str = crypto.decryptToString(str);
+    ui->messagesEdit->append(QDateTime::currentDateTime().time().toString() + "\t" + str);
 }
 
 void MainWindow::raiseWarning(QString title, QString message)

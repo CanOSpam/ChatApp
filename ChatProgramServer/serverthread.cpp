@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <QtCore>
 #include <QDebug>
+#include <sys/time.h>
 #include "serverthread.h"
 #include "extras.h"
 #define PORT 42069
@@ -28,12 +29,16 @@ void serverThread::run()
     int nready;
     int client[FD_SETSIZE];
     struct sockaddr_in cliaddrs[FD_SETSIZE];
+    struct timeval timeout;
     char buf[MAXLINE];
     ssize_t n;
     struct sockaddr_in cliaddr, servaddr;
     socklen_t clilen;
     fd_set rset, allset;
 
+    // set timeout to 1000 microseconds
+    timeout.tv_sec = 0;
+    timeout.tv_usec = 1000;
 
     // clear the buffer
     memset(&buf,0,sizeof(buf));
@@ -92,9 +97,14 @@ void serverThread::run()
         rset = allset;
 
         // Select blocks waiting for action
-        if ((nready = select(maxfd + 1,&rset, NULL,NULL,NULL)) == -1)
+        if ((nready = select(maxfd + 1,&rset, NULL,NULL,&timeout)) == -1)
         {
             qDebug() << "Select Failure";
+        }
+        else if (nready == 0)
+        {
+            qDebug() << "Select Timeout";
+            continue;
         }
 
         if (FD_ISSET(listenfd,&rset))

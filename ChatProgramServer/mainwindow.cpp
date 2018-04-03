@@ -54,4 +54,5 @@ void MainWindow::on_actionStop_triggered()
     server.running = false;
     // Need to skip blocking calls, once that is figured out this will work
     server.wait();
+    ui->listWidget->clear();
 }

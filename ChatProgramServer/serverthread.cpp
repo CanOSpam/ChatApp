@@ -201,4 +201,9 @@ void serverThread::run()
             }
         }
     }
+    shutdown(sockfd, SHUT_RD);
+    ::close(sockfd);
+    shutdown(listenfd, SHUT_RD);
+    ::close(listenfd);
+
 }

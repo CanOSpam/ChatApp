@@ -122,11 +122,11 @@ void MainWindow::connectToServer()
 
     ui->messagesEdit->setText("");
 
-    QString ipAddr = QInputDialog::getText(this, tr("QInputDialog::getText()"),
+    QString ipAddr = QInputDialog::getText(this, tr("IP Address"),
                                              tr("IP to connect to:"), QLineEdit::Normal,
                                              "0.0.0.0", &ok);
 
-    username = QInputDialog::getText(this, tr("QInputDialog::getText()"),
+    username = QInputDialog::getText(this, tr("Username"),
                                              tr("Username:"), QLineEdit::Normal,
                                              "", &ok);
 

@@ -1,3 +1,28 @@
+/*------------------------------------------------------------------------------------------------------------------
+-- SOURCE FILE: serverthread.cpp - Creates a server on port 42069 that chat clients can connect to.
+--
+-- PROGRAM: ChatProgramServer
+--
+-- FUNCTIONS:
+-- void serverThread::run()
+-- void Close(int Filedesc)
+--
+-- DATE: April 4, 2018
+--
+-- REVISIONS: March 25, 2018
+--            March 28, 2018
+--            March 29, 2018
+--            April 3,  2018
+--
+-- DESIGNER: Alfred Swinton
+--
+-- PROGRAMMER: Alfred Swinton
+--             Tim
+--
+-- NOTES:
+-- This program function creates a server that listens on port 42069 it accepts clients and relays message sent by the
+-- clients to other connected client.
+----------------------------------------------------------------------------------------------------------------------*/
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
@@ -14,7 +39,27 @@ serverThread::serverThread()
 {
     running = true;
 }
-
+/*------------------------------------------------------------------------------------------------------------------
+-- FUNCTION: serverThread::run()
+--
+-- DATE: April 4, 2018
+--
+-- REVISIONS: March 25, 2018
+--            March 28, 2018
+--            March 29, 2018
+--            April 3,  2018
+--
+-- DESIGNER: Alfred Swinton
+--
+-- PROGRAMMER: Alfred Switnon
+--
+-- INTERFACE: void serverThread::run()
+--
+-- RETURNS: void.
+--
+-- NOTES:
+-- This function is initialized by the menu button connect and it listens for the client connections.
+----------------------------------------------------------------------------------------------------------------------*/
 void serverThread::run()
 {
     int listenfd;
@@ -39,6 +84,7 @@ void serverThread::run()
     memset(&buf,0,sizeof(buf));
 
     // Create the listen socket
+
     if ((listenfd = socket(AF_INET,SOCK_STREAM, 0)) == -1)
     {
         qDebug() << "Failed to Create Listen Socket";

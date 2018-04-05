@@ -1,7 +1,42 @@
+/*------------------------------------------------------------------------------------------------------------------
+-- SOURCE FILE: mainwindow.cpp - A client paired with a server that allows text chat.
+--
+-- PROGRAM: Chat client server
+--
+-- FUNCTIONS:
+--    void connectAll( void )
+--    void raiseWarning(QString title, QString message)
+--    void writeToTextEdit(QString str)
+--
+-- SLOTS:
+--    void connectToServer( void )
+--    void disconnectFromServer( void )
+--    void saveToFile( void )
+--    void sendToServer( void )
+--    void writeReceivedToTextEdit(QString str)
+--
+-- SIGNALS:
+--    void gotNewText(QString str)
+--
+--
+-- DATE: April 3, 2018
+--
+-- REVISIONS: None to date
+--
+-- DESIGNER: Tim Bruecker
+--
+-- PROGRAMMER: Tim Bruecker
+--
+-- NOTES:
+-- The program starts a client that can then connect to a server by specifying an ip address and user name.
+-- The communications are obfuscated end to end by using the qt simplecrypt library, which changes the encoding of the text
+-- using a seed key. This method of 'encryption' isn't very strong, but does prevent the server, or anyone sniffing packets
+-- from being to read plain text.
+----------------------------------------------------------------------------------------------------------------------*/
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-
+// Constructor initialises the crypto key.
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -11,15 +46,32 @@ MainWindow::MainWindow(QWidget *parent) :
     crypto.setKey(Q_UINT64_C(0x0e99d0161aa9070c));
 }
 
+// Destructor disconnects from server and quits.
 MainWindow::~MainWindow()
 {
-    //Send Quit Message
     disconnectFromServer();
 
     delete ui;
 }
 
-// Connect buttons and actions
+/*------------------------------------------------------------------------------------------------------------------
+-- FUNCTION: connectAll
+--
+-- DATE: April 3, 2018
+--
+-- REVISIONS: None to date
+--
+-- DESIGNER: Tim Bruecker
+--
+-- PROGRAMMER: Tim Bruecker
+--
+-- INTERFACE: void connectAll (void)
+--
+-- RETURNS: void.
+--
+-- NOTES:
+-- This function must be called in the constructor, it connect all the required signals and slots in the client.
+----------------------------------------------------------------------------------------------------------------------*/
 void MainWindow::connectAll()
 {
     connect(ui->actionConnect, &QAction::triggered, this, &MainWindow::connectToServer);
@@ -30,7 +82,26 @@ void MainWindow::connectAll()
     connect(this, &MainWindow::gotNewText, this, &MainWindow::writeReceivedToTextEdit);
 }
 
-// Connect to server
+/*------------------------------------------------------------------------------------------------------------------
+-- FUNCTION: connectToServer
+--
+-- DATE: April 3, 2018
+--
+-- REVISIONS: None to date
+--
+-- DESIGNER: Tim Bruecker
+--
+-- PROGRAMMER: Tim Bruecker
+--
+-- INTERFACE: void connectToServer (void)
+--
+-- RETURNS: void.
+--
+-- NOTES:
+-- This function creates a socket, then gets user input for the ip address and user name to connect to. After succesfully
+-- reading input, it opens the socket and connects to the server. If this is succesful, it starts a thread that reads
+-- messages from the server and emits a signal every time it catches new data.
+----------------------------------------------------------------------------------------------------------------------*/
 void MainWindow::connectToServer()
 {
     memset((char *)&server, '\0', sizeof(struct sockaddr_in));
@@ -51,11 +122,11 @@ void MainWindow::connectToServer()
 
     ui->messagesEdit->setText("");
 
-    QString ipAddr = QInputDialog::getText(this, tr("QInputDialog::getText()"),
+    QString ipAddr = QInputDialog::getText(this, tr("IP Address"),
                                              tr("IP to connect to:"), QLineEdit::Normal,
                                              "0.0.0.0", &ok);
 
-    username = QInputDialog::getText(this, tr("QInputDialog::getText()"),
+    username = QInputDialog::getText(this, tr("Username"),
                                              tr("Username:"), QLineEdit::Normal,
                                              "", &ok);
 
@@ -115,10 +186,27 @@ void MainWindow::connectToServer()
 
 }
 
-// Disconnect from server and cleanup
+/*------------------------------------------------------------------------------------------------------------------
+-- FUNCTION: disconnectFromServer
+--
+-- DATE: April 3, 2018
+--
+-- REVISIONS: None to date
+--
+-- DESIGNER: Tim Bruecker
+--
+-- PROGRAMMER: Tim Bruecker
+--
+-- INTERFACE: void disconnectFromServer (void)
+--
+-- RETURNS: void.
+--
+-- NOTES:
+-- This function closes the socket currently in use and stops the receiver thread. It also resets UI elements so
+-- the program is ready to connect to a server again.
+----------------------------------------------------------------------------------------------------------------------*/
 void MainWindow::disconnectFromServer()
 {
-    // TODO:
     // Close connection to server
     shutdown(listen_sd, SHUT_RD);
     ::close(listen_sd);
@@ -138,7 +226,25 @@ void MainWindow::disconnectFromServer()
     ui->actionDisconnect->setEnabled(false);
 }
 
-// Save chatlog to file
+/*------------------------------------------------------------------------------------------------------------------
+-- FUNCTION: saveToFile
+--
+-- DATE: April 3, 2018
+--
+-- REVISIONS: None to date
+--
+-- DESIGNER: Tim Bruecker
+--
+-- PROGRAMMER: Tim Bruecker
+--
+-- INTERFACE: void saveToFile (void)
+--
+-- RETURNS: void.
+--
+-- NOTES:
+-- This function gets user input for a filename and location to save to, then writes the contents of the chat window
+-- to that file.
+----------------------------------------------------------------------------------------------------------------------*/
 void MainWindow::saveToFile()
 {
     std::ofstream saveFile;
@@ -153,7 +259,24 @@ void MainWindow::saveToFile()
     saveFile.close();
 }
 
-// Send chat message to server
+/*------------------------------------------------------------------------------------------------------------------
+-- FUNCTION: sendToServer
+--
+-- DATE: April 3, 2018
+--
+-- REVISIONS: None to date
+--
+-- DESIGNER: Tim Bruecker
+--
+-- PROGRAMMER: Tim Bruecker
+--
+-- INTERFACE: void sendToServer (void)
+--
+-- RETURNS: void.
+--
+-- NOTES:
+-- This function sends a chat message to the server. it sends the username and chat message, seperated by a colon.
+----------------------------------------------------------------------------------------------------------------------*/
 void MainWindow::sendToServer()
 {
     // Write to textedit
@@ -177,20 +300,78 @@ void MainWindow::sendToServer()
     ui->sendEdit->setText("");
 }
 
-// Write a QString to chat messages window
+/*------------------------------------------------------------------------------------------------------------------
+-- FUNCTION: writeToTextEdit
+--
+-- DATE: April 3, 2018
+--
+-- REVISIONS: None to date
+--
+-- DESIGNER: Tim Bruecker
+--
+-- PROGRAMMER: Tim Bruecker
+--
+-- INTERFACE: void writeToTextEdit (QString str)
+--             QString str: The string to write to the chat window. Contains a username and message.
+--
+-- RETURNS: void.
+--
+-- NOTES:
+-- This function takes in a QString, decrypts it using crypto and appends it to the chat window with a timestamp.
+-- This function is the same as the one below, but it is a standalone function instead of a slot.
+----------------------------------------------------------------------------------------------------------------------*/
 void MainWindow::writeToTextEdit(QString str)
 {
     str = crypto.decryptToString(str);
     ui->messagesEdit->append(QDateTime::currentDateTime().time().toString() + " ~ " + str);
 }
 
-// Slot to write a received message to messages window
+/*------------------------------------------------------------------------------------------------------------------
+-- FUNCTION: writeToTextEdit
+--
+-- DATE: April 3, 2018
+--
+-- REVISIONS: None to date
+--
+-- DESIGNER: Tim Bruecker
+--
+-- PROGRAMMER: Tim Bruecker
+--
+-- INTERFACE: void writeToTextEdit (QString str)
+--             QString str: The string to write to the chat window. Contains a username and message.
+--
+-- RETURNS: void.
+--
+-- NOTES:
+-- This function takes in a QString, decrypts it using crypto and appends it to the chat window with a timestamp.
+-- This function is the same as the one above, but it is a slot instead of a stand alone function.
+----------------------------------------------------------------------------------------------------------------------*/
 void MainWindow::writeReceivedToTextEdit(QString str)
 {
     str = crypto.decryptToString(str);
     ui->messagesEdit->append(QDateTime::currentDateTime().time().toString() + " ~ " + str);
 }
 
+/*------------------------------------------------------------------------------------------------------------------
+-- FUNCTION: raiseWarning
+--
+-- DATE: April 3, 2018
+--
+-- REVISIONS: None to date
+--
+-- DESIGNER: Tim Bruecker
+--
+-- PROGRAMMER: Tim Bruecker
+--
+-- INTERFACE: void raiseWarning (QString title, QString message)
+--             QString title: The title of the warning window.
+--             QString message: The message in the warning window.
+--
+-- RETURNS: void.
+--
+-- NOTES:
+-- This function is a wrapper that creates a warning popup displayed to the user.
+----------------------------------------------------------------------------------------------------------------------*/
 void MainWindow::raiseWarning(QString title, QString message)
 {
     QMessageBox msgBox;
